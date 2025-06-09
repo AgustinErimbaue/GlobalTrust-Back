@@ -2,7 +2,7 @@ const { where } = require("sequelize");
 const { User, Token, sequelize } = require("../models/index");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { jwt_secret } = require("../config/config.json")['development'];
+const { jwt_secret } = require("../config/config.json")["development"];
 const { Op } = require("sequelize");
 
 const UserController = {
@@ -46,20 +46,55 @@ const UserController = {
   },
   async logout(req, res) {
     try {
-        await Token.destroy({
-            where: {
-                [Op.and]: [
-                    { UserId: req.user.id },
-                    { token: req.headers.authorization }
-                ]
-            }
-        });
-        res.send({ msg: "Sesión cerrada correctamente" });
+      await Token.destroy({
+        where: {
+          [Op.and]: [
+            { UserId: req.user.id },
+            { token: req.headers.authorization },
+          ],
+        },
+      });
+      res.send({ msg: "Sesión cerrada correctamente" });
     } catch (error) {
       console
         .error(error)
         .res.status(500)
         .send({ msg: "hubo un problema al tratar de desconectarte" });
+    }
+  },
+  async deleteUser(req, res) {
+    try {
+      const user = await User.findByPk(req.params.id);
+
+      if (!user) {
+        return res.status(400).send({ msg: "No se encontro el usuario" });
+      }
+
+      await User.destroy({ where: { id: req.params.id } });
+      res
+        .status(200)
+        .send({ msg: "Se elimino el usuario correctamente", user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "Error al eliminar el usuario" });
+    }
+  },
+
+  async updateUser(req, res) {
+    try {
+      const user = await User.findByPk(req.params.id);
+      if (!user) {
+        return res.status(400).send({ msg: "no se encontro usuario" });
+      }
+      await User.update(req.body, {
+        where: { id: req.params.id },
+      });
+      res
+        .status(201)
+        .send({ msg: "Se a actualizado el usuario correctamente" });
+    } catch (error) {
+      console.error(error)
+      res.status(500).send({msg:"no se pudo actualizar el usuario"})
     }
   },
 };
