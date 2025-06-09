@@ -21,6 +21,15 @@ module.exports = {
       currency: {
         type: Sequelize.STRING
       },
+      UserId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -34,4 +43,8 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Accounts');
   }
+};
+
+Account.associate = function(models) {
+  Account.belongsTo(models.User, { foreignKey: 'UserId' });
 };
