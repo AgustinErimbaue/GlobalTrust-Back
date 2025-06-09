@@ -50,7 +50,3 @@ module.exports = {
     await queryInterface.dropTable('Users');
   }
 };
-
-User.associate = function(models) {
-  User.hasMany(models.Account, { foreignKey: 'UserId' });
-};
