@@ -4,8 +4,13 @@ const { Op, where } = require("sequelize");
 const AccountController = {
   async createAccount(req, res) {
     try {
+      const accountNumber = "";
+      for (let i = 0; i < 10; i++) {
+        accountNumber += Math.floor(Math.random() * 10).toString();
+      }
       const accountData = {
         ...req.body,
+        accountNumber,
         UserId: req.user.id,
       };
       const account = await Account.create(accountData);
