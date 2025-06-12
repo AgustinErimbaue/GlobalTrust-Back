@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const { Card, Account } = require("../models/index");
 
 const CardController = {
@@ -5,7 +6,9 @@ const CardController = {
     try {
       const account = await Account.findOne({ where: { UserId: req.user.id } });
       if (!account) {
-        return res.status(404).send({ msg: "El usuario no tiene cuentas asociadas" });
+        return res
+          .status(404)
+          .send({ msg: "El usuario no tiene cuentas asociadas" });
       }
 
       let number = "";
@@ -30,6 +33,25 @@ const CardController = {
     } catch (error) {
       console.error(error);
       res.status(400).send({ msg: "Error al crear tarjeta" });
+    }
+  },
+  async deleteCard(req, res) {
+    try {
+      const card = await Card.findByPk(req.params.id);
+      if (!card) {
+        return res
+          .status(404)
+          .send({ msg: "No hay tarjeta asociada asociada" });
+      }
+
+      if (Number(card.userId) !== Number(req.user.id)) {
+        return res.status(403).send({ msg: "No autorizado" });
+      }
+      await Card.destroy({ where: { id: req.params.id } });
+      res.status(200).send({ msg: "Se elimino la tarjeta correctamente" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "No se pudo eliminar la tarjeta" });
     }
   },
 };
