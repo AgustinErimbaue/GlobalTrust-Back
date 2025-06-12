@@ -4,7 +4,7 @@ const { Op, where } = require("sequelize");
 const AccountController = {
   async createAccount(req, res) {
     try {
-      const accountNumber = "";
+      let accountNumber = "";
       for (let i = 0; i < 10; i++) {
         accountNumber += Math.floor(Math.random() * 10).toString();
       }
