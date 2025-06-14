@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
+require("dotenv").config();
 app.use(express.json());
-const PORT = 8080;
+const PORT = process.env.PORT
 
 app.use("/user", require("./routes/user"));
 app.use("/account", require("./routes/account"));
