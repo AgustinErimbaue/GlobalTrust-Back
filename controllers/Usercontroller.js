@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { jwt_secret } = require("../config/config.json")["development"];
 const { Op } = require("sequelize");
+const { get } = require("../routes/user");
 
 const UserController = {
   async create(req, res) {
@@ -93,10 +94,24 @@ const UserController = {
         .status(201)
         .send({ msg: "Se a actualizado el usuario correctamente" });
     } catch (error) {
-      console.error(error)
-      res.status(500).send({msg:"no se pudo actualizar el usuario"})
+      console.error(error);
+      res.status(500).send({ msg: "no se pudo actualizar el usuario" });
     }
   },
+async getUserById(req, res) {
+    try {
+      const user = await User.findByPk(req.params.id);
+      if (!user) {
+        return res.status(404).send({ msg: "Usuario no encontrado" });
+      }
+      const userData = { ...user.toJSON() };
+      delete userData.password;
+      res.status(200).send(userData);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "Error al obtener el usuario", error });
+    }
+  }
 };
 
 module.exports = UserController;
