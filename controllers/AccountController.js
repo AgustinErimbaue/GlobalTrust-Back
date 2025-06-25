@@ -72,6 +72,27 @@ const AccountController = {
       return res.status(500).send({ msg: "Error interno del servidor" });
     }
   },
+  async updateAccount(req, res) {
+    try {
+      const account = await Account.findByPk(req.params.id);
+
+      if (!account) {
+        return res.status(404).send({ msg: "Cuenta no encontrada" });
+      }
+
+      if (account.UserId !== req.user.id) {
+        return res.status(403).send({ msg: "No autorizado" });
+      }
+
+      const updatedAccount = await account.update(req.body);
+      res
+        .status(200)
+        .send({ msg: "Cuenta actualizada correctamente", updatedAccount });
+    } catch (error) {
+      console.error(error);
+      res.status(400).send({ msg: "Error al actualizar cuenta" });
+    }
+  },
 };
 
 module.exports = AccountController;
