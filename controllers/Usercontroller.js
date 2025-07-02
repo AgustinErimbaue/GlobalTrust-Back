@@ -57,24 +57,23 @@ const UserController = {
       });
       res.send({ msg: "Sesión cerrada correctamente" });
     } catch (error) {
-      console
-        .error(error)
-        .res.status(500)
-        .send({ msg: "hubo un problema al tratar de desconectarte" });
+      console.error(error);
+      res.status(500).send({ msg: "hubo un problema al tratar de desconectarte" });
     }
   },
   async deleteUser(req, res) {
     try {
+      if (Number(req.params.id) !== Number(req.user.id)) {
+        return res.status(403).send({ msg: "No autorizado" });
+      }
+      
       const user = await User.findByPk(req.params.id);
-
       if (!user) {
-        return res.status(400).send({ msg: "No se encontro el usuario" });
+        return res.status(404).send({ msg: "No se encontró el usuario" });
       }
 
       await User.destroy({ where: { id: req.params.id } });
-      res
-        .status(200)
-        .send({ msg: "Se elimino el usuario correctamente", user });
+      res.status(200).send({ msg: "Se eliminó el usuario correctamente" });
     } catch (error) {
       console.error(error);
       res.status(500).send({ msg: "Error al eliminar el usuario" });
@@ -83,22 +82,29 @@ const UserController = {
 
   async updateUser(req, res) {
     try {
+      if (Number(req.params.id) !== Number(req.user.id)) {
+        return res.status(403).send({ msg: "No autorizado" });
+      }
+
       const user = await User.findByPk(req.params.id);
       if (!user) {
-        return res.status(400).send({ msg: "no se encontro usuario" });
+        return res.status(404).send({ msg: "No se encontró usuario" });
       }
+
+      if (req.body.password) {
+        req.body.password = await bcrypt.hashSync(req.body.password, 10);
+      }
+
       await User.update(req.body, {
         where: { id: req.params.id },
       });
-      res
-        .status(201)
-        .send({ msg: "Se a actualizado el usuario correctamente" });
+      res.status(200).send({ msg: "Se actualizó el usuario correctamente" });
     } catch (error) {
       console.error(error);
-      res.status(500).send({ msg: "no se pudo actualizar el usuario" });
+      res.status(500).send({ msg: "No se pudo actualizar el usuario" });
     }
   },
-async getUserById(req, res) {
+  async getUserById(req, res) {
     try {
       const user = await User.findByPk(req.params.id);
       if (!user) {
