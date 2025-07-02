@@ -54,6 +54,20 @@ const CardController = {
       res.status(500).send({ msg: "No se pudo eliminar la tarjeta" });
     }
   },
+  async getById(req, res) {
+    try {
+      const cards = await Card.findAll({
+        where: { userId: req.user.id }
+      });
+      if (!cards || cards.length === 0) {
+        return res.status(404).send({ msg: "No se encontraron tarjetas para este usuario" });
+      }
+      res.status(200).send(cards);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ msg: "Error al obtener las tarjetas" });
+    }
+  }
 };
 
 module.exports = CardController;
